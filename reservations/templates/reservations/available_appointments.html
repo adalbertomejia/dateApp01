@@ -116,6 +116,13 @@
         <!-- Botón para regresar al formulario de registro -->
         <a href="{% url 'book_appointment' %}" class="back-button">Regresar al formulario</a>
 
+        <!-- Mostrar mensaje de error si existe -->
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
         <table>
             <thead>
                 <tr>

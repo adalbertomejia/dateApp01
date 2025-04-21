@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Appointment
+from django.core.exceptions import ValidationError
 from datetime import date, timedelta  # Para manejar fechas y rangos de días
 
 def home(request):
@@ -16,14 +17,13 @@ def book_appointment(request):
     if request.method == 'POST':
         # Capturar los datos enviados por el formulario
         name = request.POST.get('name')
-        phone = request.POST.get('phone')  # Cambiado de email a phone
+        phone = request.POST.get('phone')
         date = request.POST.get('date')
-        time = request.POST.get('time')  # Captura el valor del campo 'time'
-        service = request.POST.get('service')
+        time = request.POST.get('time')
         service = request.POST.get('service')
         note = request.POST.get('note', '')
 
-        # Guardar los datos en la base de datos
+        # Crear una instancia del modelo con los datos enviados
         appointment = Appointment(
             name=name,
             phone=phone,
@@ -32,15 +32,24 @@ def book_appointment(request):
             service=service,
             note=note
         )
-        appointment.full_clean()  # Esto ejecuta las validaciones definidas en el modelo
-        appointment.save()  # Solo se ejecutará si no hay errores de validación
-        # Redirigir a la página de confirmación
-        return render(request, 'reservations/confirmation.html', {
-            'name': name,
-            'service': service,
-            'date': date,
-            'time': time,
-        })
+
+        try:
+            # Validar y guardar la cita
+            appointment.full_clean()  # Ejecuta las validaciones definidas en el modelo
+            appointment.save()  # Solo se ejecutará si no hay errores de validación
+
+            # Redirigir a la página de confirmación
+            return render(request, 'reservations/confirmation.html', {
+                'name': name,
+                'service': service,
+                'date': date,
+                'time': time,
+            })
+        except ValidationError as e:
+            # Si ocurre un error de validación, redirigir a la tabla con el mensaje de error
+            return render(request, 'reservations/available_appointments.html', {
+                'error_message': 'La fecha y hora seleccionadas ya están ocupadas. Por favor, elige otra.',
+            })
     
     return render(request, 'reservations/home.html')
 
