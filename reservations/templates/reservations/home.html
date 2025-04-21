@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business_name }}</title>
+    <style>
+        html, body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-image: url("{% static 'interior.jpg' %}"); /* Imagen de fondo */
+            background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
+            background-position: center; /* Centra la imagen */
+            background-repeat: no-repeat; /* Evita que la imagen se repita */
+            color: #3a3a3a; /* Texto gris oscuro */
+        }
+        header {
+            background-color: rgba(168, 213, 186, 0.9); /* Verde pastel más oscuro con transparencia */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #7bbf9e; /* Verde más oscuro */
+        }
+        nav {
+            background-color: rgba(123, 191, 158, 0.9); /* Verde oscuro con transparencia */
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con transparencia */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        main h1 {
+            color: #4caf50; /* Verde oscuro */
+            text-align: center;
+        }
+        main p {
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+        .form-container {
+            margin-top: 20px;
+            display: none; /* Ocultar el formulario por defecto */
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4caf50; /* Verde oscuro */
+        }
+        .form-container input,
+        .form-container select,
+        .form-container textarea,
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #a8d5ba; /* Verde pastel */
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .form-container button {
+            background-color: #4caf50; /* Verde oscuro */
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #7bbf9e; /* Verde pastel más oscuro */
+        }
+
+        /* Media queries para diseño responsivo */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+            nav {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            nav a {
+                margin: 0 10px;
+            }
+            main {
+                padding: 15px;
+                margin: 10px;
+                max-width: 100%; /* Ocupa todo el ancho disponible */
+            }
+            .form-container input,
+            .form-container select,
+            .form-container textarea,
+            .form-container button {
+                font-size: 0.9rem; /* Reduce el tamaño de fuente */
+                padding: 8px; /* Reduce el padding */
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                font-size: 1rem;
+                padding: 10px;
+            }
+            nav {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+            nav a {
+                margin: 0 5px;
+                display: block; /* Coloca los enlaces en columnas */
+                margin-bottom: 5px;
+            }
+            main {
+                padding: 10px;
+                margin: 5px;
+            }
+            .form-container input,
+            .form-container select,
+            .form-container textarea,
+            .form-container button {
+                font-size: 0.8rem; /* Reduce aún más el tamaño de fuente */
+                padding: 6px; /* Reduce el padding */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ business_name }}</h1>
+        <p>{{ business_address }}</p>
+        <p>{{ business_description }}</p>
+    </header>
+    <nav>
+        <a href="#" id="show-form">Servicios</a>
+        <a href="#">Reseñas</a>
+        <a href="#">Portafolio</a>
+        <a href="#">Detalles</a>
+    </nav>
+    <main>
+        <h1>Bienvenido</h1>
+        <p>Explora nuestros servicios y agenda tu cita fácilmente.</p>
+        <div class="form-container" id="form-container">
+            <form method="POST" action="/reservar/">
+                {% csrf_token %}
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="phone">Teléfono:</label>
+                <input type="text" id="phone" name="phone" maxlength="10" required>
+
+                <label for="date">Fecha:</label>
+                <input type="date" id="date" name="date" required>
+
+                <label for="time">Horario:</label>
+                <select id="time" name="time" required>
+                    <option value="09:00">09:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="13:00">01:00 PM</option>
+                    <option value="14:00">02:00 PM</option>
+                    <option value="15:00">03:00 PM</option>
+                    <option value="16:00">04:00 PM</option>
+                </select>
+
+                <label for="service">Servicio:</label>
+                <select id="service" name="service" required>
+                    <option value="consulta">Consulta</option>
+                    <option value="servicio">Servicio</option>
+                </select>
+
+                <label for="note">Nota (opcional):</label>
+                <textarea id="note" name="note"></textarea>
+
+                <button type="submit">Reservar</button>
+            </form>
+        </div>
+    </main>
+    <script>
+        // Mostrar/ocultar el formulario al hacer clic en "Servicios"
+        document.getElementById('show-form').addEventListener('click', function(event) {
+            event.preventDefault(); // Evitar que el enlace recargue la página
+            const formContainer = document.getElementById('form-container');
+            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Cita</title>
+    <style>
+        html, body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-image: url("{% static 'interior.jpg' %}"); /* Imagen de fondo */
+            background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
+            background-position: center; /* Centra la imagen */
+            background-repeat: no-repeat; /* Evita que la imagen se repita */
+            color: #3a3a3a; /* Texto gris oscuro */
+        }
+        header {
+            background-color: rgba(168, 213, 186, 0.9); /* Verde pastel más oscuro con transparencia */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #7bbf9e; /* Verde más oscuro */
+        }
+        main {
+            padding: 20px;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con transparencia */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        main h1 {
+            color: #4caf50; /* Verde oscuro */
+            margin-bottom: 20px;
+        }
+        main p {
+            margin-bottom: 15px;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+            background-color: #4caf50; /* Verde oscuro */
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        a:hover {
+            background-color: #7bbf9e; /* Verde pastel más oscuro */
+        }
+
+        /* Media queries para diseño responsivo */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+            main {
+                padding: 15px;
+                margin: 10px;
+                max-width: 100%; /* Ocupa todo el ancho disponible */
+            }
+            a {
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                font-size: 1rem;
+                padding: 10px;
+            }
+            main {
+                padding: 10px;
+                margin: 5px;
+            }
+            a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Confirmación de Cita</h1>
+    </header>
+    <main>
+        <h1>¡Cita Reservada con Éxito!</h1>
+        <p>Gracias, <strong>{{ name }}</strong>. Tu cita para <strong>{{ service }}</strong> está programada para:</p>
+        <p><strong>Fecha:</strong> {{ date }}</p>
+        <p><strong>Hora:</strong> {{ time }}</p>
+        <a href="/">Volver a la Página Principal</a>
+    </main>
+</body>
+</html>
