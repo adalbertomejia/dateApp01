@@ -23,6 +23,9 @@ def book_appointment(request):
         service = request.POST.get('service')
         note = request.POST.get('note', '')
 
+        # NUEVO: asociar al usuario si está logueado
+        user = request.user if request.user.is_authenticated else None
+
         # Crear una instancia del modelo con los datos enviados
         appointment = Appointment(
             name=name,
@@ -44,6 +47,7 @@ def book_appointment(request):
                 'service': service,
                 'date': appointment_date,
                 'time': time,
+                'phone': phone,
             })
         except ValidationError as e:
             # Si ocurre un error de validación, generar los datos para la tabla de citas disponibles

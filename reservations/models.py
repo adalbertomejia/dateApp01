@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 # Create your models here.
@@ -7,7 +8,7 @@ class Appointment(models.Model):
         ('consulta', 'Consulta'),
         ('servicio', 'Servicio'),
     ]
-
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)  # Relación con el usuario
     name = models.CharField(max_length=100)  # Nombre del cliente
     phone = models.CharField(max_length=10)  # Nuevo campo para el teléfono
     date = models.DateField()  # Fecha de la cita
@@ -15,6 +16,8 @@ class Appointment(models.Model):
     service = models.CharField(max_length=10, choices=SERVICE_CHOICES)  # Tipo de servicio
     note = models.TextField(blank=True, null=True)  # Nota opcional
 
+    
+    
     def clean(self):
         # Validación de longitud del número de teléfono
         if len(self.phone) != 10:

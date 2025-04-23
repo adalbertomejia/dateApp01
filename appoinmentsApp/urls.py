@@ -15,7 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.contrib.auth import views as auth_views
+from django.urls import path, include
 from reservations import views # Importa las vistas de la app 'reservations'
 
 urlpatterns = [
@@ -25,4 +26,6 @@ urlpatterns = [
     path('get-unavailable-slots/', views.get_unavailable_slots, name='get_unavailable_slots'),  # Ruta para el formulario
     path('get-unavailable-slots/', views.get_unavailable_slots, name='get_unavailable_slots'),  # Ruta para obtener horarios ocupados
     path('available/', views.available_appointments, name='available_appointments'),  # Ruta para citas disponibles
+    path('users/', include('users.urls')),
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'), 
 ]

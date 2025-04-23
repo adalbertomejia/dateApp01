@@ -97,5 +97,15 @@
         <p><strong>Hora:</strong> {{ time }}</p>
         <a href="/">Volver a la Página Principal</a>
     </main>
+    
+    {% if not request.user.is_authenticated %}
+        <p>¿Quieres tener acceso a tus citas y recibir recordatorios?</p>
+        <a href="{% url 'register' %}?phone={{ phone }}">Crear una cuenta</a>
+        <p style="margin-top: 10px;">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+    {% else %}
+        <p><strong>¡Ya estás logueado!</strong> Puedes ver tus citas en tu perfil.</p>
+    {% endif %}
+
+
 </body>
 </html>

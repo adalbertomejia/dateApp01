@@ -88,14 +88,30 @@
             font-weight: bold;
         }
 
+        /* Estilos para el mensaje de error */
+        .error-message {
+            background-color: #ffe6e6; /* Fondo rojo claro */
+            color: #cc0000; /* Texto rojo oscuro */
+            border: 1px solid #cc0000;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
         /* Estilos para dispositivos móviles */
         @media (max-width: 768px) {
             table {
-                font-size: 14px;
+                display: block;
+                overflow-x: auto; /* Habilitar desplazamiento horizontal */
+                white-space: nowrap; /* Evitar que las celdas se rompan */
             }
 
             th, td {
                 padding: 8px;
+                font-size: 14px;
             }
 
             h1 {
@@ -105,6 +121,35 @@
             .back-button {
                 font-size: 14px;
                 padding: 8px 16px;
+            }
+
+            .error-message {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            .back-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .error-message {
+                font-size: 12px;
+                padding: 8px;
             }
         }
     </style>
