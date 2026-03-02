@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from .models import Appointment
+from users.models import CustomUser
 
 
 BUSINESS_CONTEXT = {
@@ -53,8 +54,10 @@ def book_appointment(request):
         service = request.POST.get('service')
         note = request.POST.get('note', '')
 
+        related_user = request.user if request.user.is_authenticated else CustomUser.objects.filter(phone=phone).first()
+
         appointment = Appointment(
-            user=request.user if request.user.is_authenticated else None,
+            user=related_user,
             name=name,
             phone=phone,
             date=appointment_date,
@@ -75,6 +78,7 @@ def book_appointment(request):
                     'date': appointment_date,
                     'time': time,
                     'phone': phone,
+                    'related_user': related_user,
                 },
             )
         except ValidationError:

@@ -41,6 +41,10 @@
             {% if request.user.is_authenticated %}
                 <span class="brand-pill align-self-center">Hola, {{ request.user.username }}</span>
                 <a href="{% url 'dashboard' %}" class="btn btn-success btn-sm">Mi panel</a>
+                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar sesión</button>
+                </form>
             {% else %}
                 <a href="{% url 'login' %}" class="btn btn-success btn-sm">Iniciar sesión</a>
             {% endif %}
