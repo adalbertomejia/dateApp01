@@ -3,18 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             const unavailableSlots = data;
+            const dateInput = document.getElementById('date');
+            const timeSelect = document.getElementById('time');
 
-            // Deshabilitar fechas ocupadas
-            const dateInput = document.querySelector('input[type="date"]');
+            if (!dateInput || !timeSelect) {
+                return;
+            }
+
             dateInput.addEventListener('change', (e) => {
                 const selectedDate = e.target.value;
-                const timeInput = document.querySelector('input[type="time"]');
-                timeInput.disabled = false;
 
-                // Deshabilitar horas ocupadas para la fecha seleccionada
+                Array.from(timeSelect.options).forEach(option => {
+                    option.disabled = false;
+                });
+
                 unavailableSlots.forEach(slot => {
                     if (slot.date === selectedDate) {
-                        const option = document.querySelector(`option[value="${slot.time}"]`);
+                        const slotHour = slot.time.slice(0, 5);
+                        const option = timeSelect.querySelector(`option[value="${slotHour}"]`);
                         if (option) {
                             option.disabled = true;
                         }
