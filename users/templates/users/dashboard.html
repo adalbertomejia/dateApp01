@@ -13,6 +13,10 @@
         <div class="d-flex gap-2 align-items-center">
             <span class="badge text-bg-success-subtle text-success-emphasis border border-success-subtle">{{ request.user.username }}</span>
             <a href="{% url 'home' %}" class="btn btn-outline-success btn-sm">Inicio</a>
+            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar sesión</button>
+            </form>
         </div>
     </div>
 </nav>

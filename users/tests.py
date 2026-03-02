@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from reservations.models import Appointment
+from users.forms import CustomUserCreationForm
 
 
 class DashboardViewTests(TestCase):
@@ -49,3 +50,26 @@ class DashboardViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Maria User')
         self.assertNotContains(response, 'Other User')
+
+
+class CustomUserCreationFormTests(TestCase):
+    def test_rejects_repeated_phone(self):
+        user_model = get_user_model()
+        user_model.objects.create_user(
+            username='existing',
+            password='safe-pass-123',
+            phone='5512345678',
+        )
+
+        form = CustomUserCreationForm(
+            data={
+                'username': 'nuevo',
+                'email': 'nuevo@example.com',
+                'phone': '5512345678',
+                'password1': 'OtherSafePass123!',
+                'password2': 'OtherSafePass123!',
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('Este teléfono ya está registrado', form.errors['phone'][0])

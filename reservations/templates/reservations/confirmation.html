@@ -98,12 +98,15 @@
         <a href="/">Volver a la Página Principal</a>
     </main>
     
-    {% if not request.user.is_authenticated %}
+    {% if request.user.is_authenticated %}
+        <p><strong>¡Ya estás logueado!</strong> Puedes ver tus citas en tu perfil.</p>
+    {% elif related_user %}
+        <p>Detectamos una cuenta existente con este teléfono. Inicia sesión para ver esta cita en tu panel.</p>
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+    {% else %}
         <p>¿Quieres tener acceso a tus citas y recibir recordatorios?</p>
         <a href="{% url 'register' %}?phone={{ phone }}">Crear una cuenta</a>
         <p style="margin-top: 10px;">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
-    {% else %}
-        <p><strong>¡Ya estás logueado!</strong> Puedes ver tus citas en tu perfil.</p>
     {% endif %}
 
 
