@@ -5,224 +5,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ business_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
-        html, body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-image: url("{% static 'interior.jpg' %}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: #3a3a3a;
-        }
-        header {
-            background-color: rgba(168, 213, 186, 0.9);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid #7bbf9e;
-        }
-        nav {
-            background-color: rgba(123, 191, 158, 0.9);
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            margin: 20px auto;
-            max-width: 800px;
-        }
-        nav a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        nav a.active {
-            background-color: #a8d5ba; /* Verde suave */
-            color: #333; /* Texto oscuro */
-        }
-        main {
-            padding: 20px;
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        main h1 {
-            color: #4caf50;
-            text-align: center;
-        }
-        main p {
-            text-align: justify;
-            margin-bottom: 15px;
-        }
-        .form-container {
-            margin-top: 20px;
-            display: none; /* Ocultar el formulario por defecto */
-        }
-        .form-container label {
-            display: block;
-            margin-bottom: 5px;
-            color: #4caf50;
-        }
-        .form-container input,
-        .form-container select,
-        .form-container textarea,
-        .form-container button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #a8d5ba;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-        .form-container button {
-            background-color: #4caf50;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #7bbf9e;
+        body {
+            background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.9)), url("{% static 'interior.jpg' %}") center/cover no-repeat fixed;
+            min-height: 100vh;
         }
 
-        /* Media queries para diseño responsivo */
-        @media (max-width: 768px) {
-            header {
-                padding: 15px;
-                font-size: 1.2rem;
-            }
-            nav {
-                padding: 10px;
-                font-size: 0.9rem;
-            }
-            nav a {
-                margin: 0 10px;
-            }
-            main {
-                padding: 15px;
-                margin: 10px;
-                max-width: 100%;
-            }
-            .form-container input,
-            .form-container select,
-            .form-container textarea,
-            .form-container button {
-                font-size: 0.9rem;
-                padding: 8px;
-            }
+        .hero-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.75rem 2rem rgba(36, 85, 54, 0.15);
         }
 
-        @media (max-width: 480px) {
-            header {
-                font-size: 1rem;
-                padding: 10px;
-            }
-            nav {
-                font-size: 0.8rem;
-                padding: 8px;
-            }
-            nav a {
-                margin: 0 5px;
-                display: block;
-                margin-bottom: 5px;
-            }
-            main {
-                padding: 10px;
-                margin: 5px;
-            }
-            .form-container input,
-            .form-container select,
-            .form-container textarea,
-            .form-container button {
-                font-size: 0.8rem;
-                padding: 6px;
-            }
+        .brand-pill {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 999px;
+            font-size: .85rem;
+            font-weight: 600;
+            padding: .3rem .8rem;
+        }
+
+        .service-panel {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>{{ business_name }}</h1>
-        <p>{{ business_address }}</p>
-        <p>{{ business_description }}</p>
-    </header>
-    <nav>
-        <a href="#" id="show-form" class="nav-link">Servicios</a>
-        <a href="#" class="nav-link">Reseñas</a>
-        <a href="#" class="nav-link">Portafolio</a>
-        <a href="#" class="nav-link">Detalles</a>
-    </nav>
-    <main>
-        <h1>Bienvenido</h1>
-        <p>Explora nuestros servicios y agenda tu cita fácilmente.</p>
-        <div class="form-container" id="form-container">
-            <form method="POST" action="/reservar/">
-                {% csrf_token %}
-                <label for="name">Nombre:</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="phone">Teléfono:</label>
-                <input type="text" id="phone" name="phone" maxlength="10" required>
-
-                <label for="date">Fecha:</label>
-                <input type="date" id="date" name="date" required>
-
-                <label for="time">Horario:</label>
-                <select id="time" name="time" required>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="12:00">12:00 PM</option>
-                    <option value="13:00">01:00 PM</option>
-                    <option value="14:00">02:00 PM</option>
-                    <option value="15:00">03:00 PM</option>
-                    <option value="16:00">04:00 PM</option>
-                </select>
-
-                <label for="service">Servicio:</label>
-                <select id="service" name="service" required>
-                    <option value="consulta">Consulta</option>
-                    <option value="servicio">Servicio</option>
-                </select>
-
-                <label for="note">Nota (opcional):</label>
-                <textarea id="note" name="note"></textarea>
-
-                <button type="submit">Reservar</button>
-            </form>
+<nav class="navbar navbar-expand-lg bg-success-subtle border-bottom border-success-subtle">
+    <div class="container py-2">
+        <span class="navbar-brand fw-bold text-success mb-0">{{ business_name }}</span>
+        <div class="d-flex gap-2">
+            <a href="{% url 'available_appointments' %}" class="btn btn-outline-success btn-sm">Horarios</a>
+            {% if request.user.is_authenticated %}
+                <span class="brand-pill align-self-center">Hola, {{ request.user.username }}</span>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-success btn-sm">Iniciar sesión</a>
+            {% endif %}
         </div>
-    </main>
-    <script>
-        // Seleccionar todas las pestañas de navegación
-        const navLinks = document.querySelectorAll('.nav-link');
+    </div>
+</nav>
 
-        // Agregar un evento de clic a cada enlace
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault(); // Evitar que el enlace recargue la página
+<main class="container py-5">
+    <div class="card hero-card">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <h1 class="h3 mb-0">Agenda tu cita nutricional</h1>
+                <span class="brand-pill">Atención personalizada</span>
+            </div>
+            <p class="text-secondary mb-1"><strong>Dirección:</strong> {{ business_address }}</p>
+            <p class="text-secondary">{{ business_description }}</p>
 
-                // Eliminar la clase 'active' de todas las pestañas
-                navLinks.forEach(nav => nav.classList.remove('active'));
+            <div class="d-flex gap-2 flex-wrap mb-4">
+                <button class="btn btn-success" id="show-form" type="button">Reservar servicio</button>
+                <a href="{% url 'available_appointments' %}" class="btn btn-outline-secondary">Ver disponibilidad semanal</a>
+            </div>
 
-                // Agregar la clase 'active' solo al enlace clicado
-                this.classList.add('active');
+            <section class="service-panel" id="form-container">
+                <h2 class="h5 mb-3">Formulario de reservación</h2>
+                <form method="POST" action="{% url 'book_appointment' %}" class="row g-3">
+                    {% csrf_token %}
 
-                // Mostrar/ocultar el formulario si se hace clic en "Servicios"
-                if (this.id === 'show-form') {
-                    const formContainer = document.getElementById('form-container');
-                    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-                }
-            });
-        });
-    </script>
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Nombre</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Teléfono</label>
+                        <input type="text" id="phone" name="phone" class="form-control" maxlength="10" pattern="[0-9]{10}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="date" class="form-label">Fecha</label>
+                        <input type="date" id="date" name="date" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="time" class="form-label">Horario</label>
+                        <select id="time" name="time" class="form-select" required>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">01:00 PM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="service" class="form-label">Servicio</label>
+                        <select id="service" name="service" class="form-select" required>
+                            <option value="consulta">Consulta</option>
+                            <option value="servicio">Seguimiento nutricional</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="note" class="form-label">Nota (opcional)</label>
+                        <textarea id="note" name="note" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-12 d-grid d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-success px-4">Reservar</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script>
+    const showFormButton = document.getElementById('show-form');
+    const formContainer = document.getElementById('form-container');
+
+    showFormButton.addEventListener('click', () => {
+        const isHidden = formContainer.style.display === '' || formContainer.style.display === 'none';
+        formContainer.style.display = isHidden ? 'block' : 'none';
+        showFormButton.textContent = isHidden ? 'Ocultar formulario' : 'Reservar servicio';
+    });
+</script>
+<script src="{% static 'js/unavailable_slots.js' %}"></script>
 </body>
 </html>

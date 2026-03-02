@@ -24,7 +24,6 @@ urlpatterns = [
     path('', views.home, name='home'), # Ruta principal que apunta a la vista 'home'
     path('reservar/', views.book_appointment, name='book_appointment'),
     path('get-unavailable-slots/', views.get_unavailable_slots, name='get_unavailable_slots'),  # Ruta para el formulario
-    path('get-unavailable-slots/', views.get_unavailable_slots, name='get_unavailable_slots'),  # Ruta para obtener horarios ocupados
     path('available/', views.available_appointments, name='available_appointments'),  # Ruta para citas disponibles
     path('users/', include('users.urls')),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'), 
