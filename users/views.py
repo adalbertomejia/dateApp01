@@ -21,24 +21,7 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
-@login_required
-def panel_home(request):
-    if request.user.is_nutritionist:
-        return redirect('admin_dashboard')
-    return redirect('dashboard')
-
-
-@login_required
-def dashboard(request):
-    if request.user.is_nutritionist:
-        return redirect('admin_dashboard')
-
-    appointments = Appointment.objects.filter(user=request.user).order_by('date', 'time')
-    return render(request, 'users/dashboard.html', {'appointments': appointments})
-
-
-@user_passes_test(lambda user: user.is_nutritionist, login_url='home')
-def admin_dashboard(request):
+def _admin_dashboard_context():
     today = date.today()
     week_end = today + timedelta(days=6)
 
@@ -64,17 +47,35 @@ def admin_dashboard(request):
         upcoming_appointments.values('name', 'phone').annotate(total_visits=Count('id')).order_by('-total_visits', 'name')[:5]
     )
 
-    return render(
-        request,
-        'users/admin_dashboard.html',
-        {
-            'today_appointments': today_appointments,
-            'upcoming_appointments': upcoming_appointments[:12],
-            'appointments_by_service': appointments_by_service,
-            'recent_clients': recent_clients,
-            'total_appointments': all_appointments.count(),
-            'today_total': today_appointments.count(),
-            'upcoming_total': upcoming_appointments.count(),
-            'occupancy_rate': occupancy_rate,
-        },
-    )
+    return {
+        'today_appointments': today_appointments,
+        'upcoming_appointments': upcoming_appointments[:12],
+        'appointments_by_service': appointments_by_service,
+        'recent_clients': recent_clients,
+        'total_appointments': all_appointments.count(),
+        'today_total': today_appointments.count(),
+        'upcoming_total': upcoming_appointments.count(),
+        'occupancy_rate': occupancy_rate,
+    }
+
+
+@login_required
+def panel_home(request):
+    if request.user.is_nutritionist:
+        return render(request, 'users/admin_dashboard.html', _admin_dashboard_context())
+
+    return redirect('dashboard')
+
+
+@login_required
+def dashboard(request):
+    if request.user.is_nutritionist:
+        return redirect('panel_home')
+
+    appointments = Appointment.objects.filter(user=request.user).order_by('date', 'time')
+    return render(request, 'users/dashboard.html', {'appointments': appointments})
+
+
+@user_passes_test(lambda user: user.is_nutritionist, login_url='home')
+def admin_dashboard(request):
+    return redirect('panel_home')
