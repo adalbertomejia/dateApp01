@@ -52,6 +52,34 @@ class DashboardViewTests(TestCase):
         self.assertNotContains(response, 'Other User')
 
 
+class AdminDashboardViewTests(TestCase):
+    def setUp(self):
+        self.user_model = get_user_model()
+        self.admin_user = self.user_model.objects.create_user(
+            username='admin',
+            password='safe-pass-123',
+            is_nutritionist=True,
+            is_patient=False,
+        )
+
+    def test_nutritionist_sees_admin_panel(self):
+        Appointment.objects.create(
+            name='Client One',
+            phone='5511111111',
+            date=date.today(),
+            time=time(9, 0),
+            service='consulta',
+        )
+
+        self.client.login(username='admin', password='safe-pass-123')
+        response = self.client.get(reverse('dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['is_admin_panel'])
+        self.assertContains(response, 'Panel de administración')
+        self.assertContains(response, 'Client One')
+
+
 class CustomUserCreationFormTests(TestCase):
     def test_rejects_repeated_phone(self):
         user_model = get_user_model()
