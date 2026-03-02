@@ -1,4 +1,7 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+
+from reservations.models import Appointment
 from .forms import CustomUserCreationForm
 
 def register(request):
@@ -12,3 +15,16 @@ def register(request):
         form = CustomUserCreationForm(initial={'phone': phone})
 
     return render(request, 'users/register.html', {'form': form})
+
+
+@login_required
+def dashboard(request):
+    appointments = (
+        Appointment.objects.filter(user=request.user)
+        .order_by('date', 'time')
+    )
+    return render(
+        request,
+        'users/dashboard.html',
+        {'appointments': appointments},
+    )

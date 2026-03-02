@@ -1,201 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citas Disponibles</title>
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-        }
-
-        h1 {
-            text-align: center;
-            color: #4CAF50;
-            margin-top: 20px;
-            font-size: 24px;
-        }
-
-        /* Contenedor principal */
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        /* Botón de regresar */
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .back-button:hover {
-            background-color: #45a049;
-        }
-
-        /* Estilos de la tabla */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        tr:hover {
-            background-color: #eafaf1;
-        }
-
-        /* Estilos para celdas disponibles y ocupadas */
-        .available {
-            background-color: #ccffcc; /* Verde claro */
-            color: #2d7a2d;
-            font-weight: bold;
-        }
-
-        .occupied {
-            background-color: #ffcccc; /* Rojo claro */
-            color: #a94442;
-            font-weight: bold;
-        }
-
-        /* Estilos para el mensaje de error */
-        .error-message {
-            background-color: #ffe6e6; /* Fondo rojo claro */
-            color: #cc0000; /* Texto rojo oscuro */
-            border: 1px solid #cc0000;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* Estilos para dispositivos móviles */
-        @media (max-width: 768px) {
-            table {
-                display: block;
-                overflow-x: auto; /* Habilitar desplazamiento horizontal */
-                white-space: nowrap; /* Evitar que las celdas se rompan */
-            }
-
-            th, td {
-                padding: 8px;
-                font-size: 14px;
-            }
-
-            h1 {
-                font-size: 20px;
-            }
-
-            .back-button {
-                font-size: 14px;
-                padding: 8px 16px;
-            }
-
-            .error-message {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 6px;
-            }
-
-            h1 {
-                font-size: 18px;
-            }
-
-            .back-button {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-
-            .error-message {
-                font-size: 12px;
-                padding: 8px;
-            }
-        }
-    </style>
+    <title>Citas disponibles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
-<body>
-    <div class="container">
-        <h1>Citas Disponibles ({{ start_date }} - {{ end_date }})</h1>
+<body class="bg-light">
+    <main class="container py-4 py-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                        <h1 class="h4 mb-1 text-success">Citas disponibles</h1>
+                        <p class="text-secondary mb-0">Semana: {{ start_date }} - {{ end_date }}</p>
+                    </div>
+                    <a href="{% url 'book_appointment' %}" class="btn btn-outline-success btn-sm">Regresar al formulario</a>
+                </div>
 
-        <!-- Botón para regresar al formulario de registro -->
-        <a href="{% url 'book_appointment' %}" class="back-button">Regresar al formulario</a>
+                {% if error_message %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_message }}
+                </div>
+                {% endif %}
 
-        <!-- Mostrar mensaje de error si existe -->
-        {% if error_message %}
-        <div class="error-message">
-            {{ error_message }}
-        </div>
-        {% endif %}
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <!-- Mostrar las horas laborales como encabezados -->
-                    {% for date, hours in schedule.items %}
-                        {% if forloop.first %}
-                            {% for hour in hours %}
-                                <th>{{ hour.hour }}</th>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Fecha</th>
+                                {% for date, hours in schedule.items %}
+                                    {% if forloop.first %}
+                                        {% for hour in hours %}
+                                            <th>{{ hour.hour|slice:":5" }}</th>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for date, hours in schedule.items %}
+                                <tr>
+                                    <td class="fw-semibold">{{ date }}</td>
+                                    {% for hour in hours %}
+                                        <td>
+                                            {% if hour.status == 'Disponible' %}
+                                                <span class="badge text-bg-success">Disponible</span>
+                                            {% else %}
+                                                <span class="badge text-bg-danger">Ocupada</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
                             {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for date, hours in schedule.items %}
-                    <tr>
-                        <td>{{ date }}</td>
-                        <!-- Mostrar el estado de cada hora (Disponible o No disponible) con estilos condicionales -->
-                        {% for hour in hours %}
-                            <td class="{% if hour.status == 'Disponible' %}available{% else %}occupied{% endif %}">
-                                {{ hour.status }}
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
