@@ -8,58 +8,15 @@ from reservations.models import Appointment
 from users.forms import CustomUserCreationForm
 
 
-class DashboardViewTests(TestCase):
-    def setUp(self):
-        self.user_model = get_user_model()
-        self.user = self.user_model.objects.create_user(
-            username='maria',
-            password='safe-pass-123',
-        )
-        self.other_user = self.user_model.objects.create_user(
-            username='otro',
-            password='safe-pass-123',
-        )
-
-    def test_dashboard_requires_authentication(self):
-        response = self.client.get(reverse('dashboard'))
-
-        self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('login'), response.url)
-
-    def test_dashboard_shows_only_logged_user_appointments(self):
-        Appointment.objects.create(
-            user=self.user,
-            name='Maria User',
-            phone='5512345678',
-            date=date(2026, 1, 10),
-            time=time(9, 0),
-            service='consulta',
-        )
-        Appointment.objects.create(
-            user=self.other_user,
-            name='Other User',
-            phone='5598765432',
-            date=date(2026, 1, 11),
-            time=time(10, 0),
-            service='servicio',
-        )
-
-        self.client.login(username='maria', password='safe-pass-123')
-        response = self.client.get(reverse('dashboard'))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Maria User')
-        self.assertNotContains(response, 'Other User')
-
-
-class AdminDashboardViewTests(TestCase):
+class PanelHomeViewTests(TestCase):
     def setUp(self):
         self.user_model = get_user_model()
         self.admin_user = self.user_model.objects.create_user(
             username='admin',
             password='safe-pass-123',
             is_nutritionist=True,
-            is_patient=False,
+            is_staff=True,
+            is_superuser=True,
         )
         self.patient_user = self.user_model.objects.create_user(
             username='paciente',
@@ -68,7 +25,40 @@ class AdminDashboardViewTests(TestCase):
             is_patient=True,
         )
 
-    def test_nutritionist_sees_admin_panel(self):
+    def test_nutritionist_redirected_to_admin_panel(self):
+        self.client.login(username='admin', password='safe-pass-123')
+
+        response = self.client.get(reverse('panel_home'))
+
+        self.assertRedirects(response, '/admin/')
+
+    def test_patient_redirected_to_home(self):
+        self.client.login(username='paciente', password='safe-pass-123')
+
+        response = self.client.get(reverse('panel_home'))
+
+        self.assertRedirects(response, reverse('home'))
+
+
+class AdminIndexViewTests(TestCase):
+    def setUp(self):
+        self.user_model = get_user_model()
+        self.admin_user = self.user_model.objects.create_user(
+            username='admin',
+            password='safe-pass-123',
+            is_nutritionist=True,
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.patient_user = self.user_model.objects.create_user(
+            username='paciente',
+            password='safe-pass-123',
+            is_nutritionist=False,
+            is_patient=True,
+            is_staff=True,
+        )
+
+    def test_nutritionist_sees_custom_admin_dashboard(self):
         Appointment.objects.create(
             name='Client One',
             phone='5511111111',
@@ -78,21 +68,15 @@ class AdminDashboardViewTests(TestCase):
         )
 
         self.client.login(username='admin', password='safe-pass-123')
-        response = self.client.get(reverse('admin_dashboard'))
+        response = self.client.get('/admin/')
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Panel de administración')
         self.assertContains(response, 'Client One')
 
-    def test_nutritionist_redirected_from_user_dashboard(self):
-        self.client.login(username='admin', password='safe-pass-123')
-        response = self.client.get(reverse('dashboard'))
-
-        self.assertRedirects(response, reverse('admin_dashboard'))
-
-    def test_patient_cannot_access_admin_dashboard(self):
+    def test_non_nutritionist_cannot_access_custom_admin_dashboard(self):
         self.client.login(username='paciente', password='safe-pass-123')
-        response = self.client.get(reverse('admin_dashboard'))
+        response = self.client.get('/admin/')
 
         self.assertRedirects(response, reverse('home'))
 

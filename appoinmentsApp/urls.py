@@ -14,13 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
+from appoinmentsApp.admin_site import nutrition_admin_site
 from reservations import views # Importa las vistas de la app 'reservations'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', nutrition_admin_site.urls),
     path('', views.home, name='home'), # Ruta principal que apunta a la vista 'home'
     path('reservar/', views.book_appointment, name='book_appointment'),
     path('get-unavailable-slots/', views.get_unavailable_slots, name='get_unavailable_slots'),  # Ruta para el formulario
