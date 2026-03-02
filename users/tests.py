@@ -67,6 +67,11 @@ class AdminDashboardViewTests(TestCase):
             is_nutritionist=False,
             is_patient=True,
         )
+        self.super_user = self.user_model.objects.create_superuser(
+            username='Adalberto',
+            email='adalberto@example.com',
+            password='safe-pass-123',
+        )
 
     def test_nutritionist_sees_admin_panel(self):
         Appointment.objects.create(
@@ -95,6 +100,25 @@ class AdminDashboardViewTests(TestCase):
         response = self.client.get(reverse('admin_dashboard'))
 
         self.assertRedirects(response, reverse('home'))
+
+    def test_superuser_sees_admin_panel(self):
+        self.client.login(username='Adalberto', password='safe-pass-123')
+        response = self.client.get(reverse('admin_dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Panel de administración')
+
+    def test_superuser_redirected_to_admin_from_panel_home(self):
+        self.client.login(username='Adalberto', password='safe-pass-123')
+        response = self.client.get(reverse('panel_home'))
+
+        self.assertRedirects(response, reverse('admin_dashboard'))
+
+    def test_superuser_redirected_from_user_dashboard(self):
+        self.client.login(username='Adalberto', password='safe-pass-123')
+        response = self.client.get(reverse('dashboard'))
+
+        self.assertRedirects(response, reverse('admin_dashboard'))
 
 
 class CustomUserCreationFormTests(TestCase):

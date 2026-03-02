@@ -8,6 +8,11 @@ from reservations.models import Appointment
 from .forms import CustomUserCreationForm
 
 
+def can_access_admin_panel(user):
+    """Allow admin panel access to nutritionists and superusers."""
+    return user.is_authenticated and (user.is_nutritionist or user.is_superuser)
+
+
 def register(request):
     phone = request.GET.get('phone', '')
     if request.method == 'POST':
@@ -23,21 +28,22 @@ def register(request):
 
 @login_required
 def panel_home(request):
-    if request.user.is_nutritionist:
+    if can_access_admin_panel(request.user):
         return redirect('admin_dashboard')
     return redirect('dashboard')
 
 
 @login_required
 def dashboard(request):
-    if request.user.is_nutritionist:
+    if can_access_admin_panel(request.user):
         return redirect('admin_dashboard')
 
     appointments = Appointment.objects.filter(user=request.user).order_by('date', 'time')
     return render(request, 'users/dashboard.html', {'appointments': appointments})
 
 
-@user_passes_test(lambda user: user.is_nutritionist, login_url='home')
+@login_required
+@user_passes_test(can_access_admin_panel, login_url='home')
 def admin_dashboard(request):
     today = date.today()
     week_end = today + timedelta(days=6)
