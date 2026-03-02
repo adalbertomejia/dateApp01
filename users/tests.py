@@ -61,6 +61,12 @@ class AdminDashboardViewTests(TestCase):
             is_nutritionist=True,
             is_patient=False,
         )
+        self.patient_user = self.user_model.objects.create_user(
+            username='paciente',
+            password='safe-pass-123',
+            is_nutritionist=False,
+            is_patient=True,
+        )
 
     def test_nutritionist_sees_admin_panel(self):
         Appointment.objects.create(
@@ -72,12 +78,23 @@ class AdminDashboardViewTests(TestCase):
         )
 
         self.client.login(username='admin', password='safe-pass-123')
-        response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('admin_dashboard'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['is_admin_panel'])
         self.assertContains(response, 'Panel de administración')
         self.assertContains(response, 'Client One')
+
+    def test_nutritionist_redirected_from_user_dashboard(self):
+        self.client.login(username='admin', password='safe-pass-123')
+        response = self.client.get(reverse('dashboard'))
+
+        self.assertRedirects(response, reverse('admin_dashboard'))
+
+    def test_patient_cannot_access_admin_dashboard(self):
+        self.client.login(username='paciente', password='safe-pass-123')
+        response = self.client.get(reverse('admin_dashboard'))
+
+        self.assertRedirects(response, reverse('home'))
 
 
 class CustomUserCreationFormTests(TestCase):
