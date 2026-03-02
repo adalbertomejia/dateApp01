@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import date, timedelta
 
 from django.core.exceptions import ValidationError
@@ -13,6 +14,8 @@ BUSINESS_CONTEXT = {
     'business_description': 'Especialista en nutrición y bienestar.',
 }
 
+WORKING_HOURS = ['09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00']
+
 
 def home(request):
     return render(request, 'reservations/home.html', BUSINESS_CONTEXT)
@@ -20,16 +23,22 @@ def home(request):
 
 def _build_schedule(start_date, days=7):
     end_date = start_date + timedelta(days=days - 1)
-    appointments = Appointment.objects.filter(date__range=(start_date, end_date)).order_by('date', 'time')
-    all_hours = ['09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00']
+    appointments = (
+        Appointment.objects.filter(date__range=(start_date, end_date))
+        .values_list('date', 'time')
+        .order_by('date', 'time')
+    )
+
+    occupied_by_day = defaultdict(set)
+    for appointment_date, appointment_time in appointments:
+        occupied_by_day[appointment_date].add(appointment_time.strftime('%H:%M:%S'))
 
     schedule = {}
     for day in (start_date + timedelta(days=i) for i in range(days)):
-        occupied_hours = appointments.filter(date=day).values_list('time', flat=True)
-        occupied_hours = [hour.strftime('%H:%M:%S') for hour in occupied_hours]
+        occupied_hours = occupied_by_day.get(day, set())
         schedule[day] = [
             {'hour': hour, 'status': 'Ocupada' if hour in occupied_hours else 'Disponible'}
-            for hour in all_hours
+            for hour in WORKING_HOURS
         ]
 
     return schedule, end_date
