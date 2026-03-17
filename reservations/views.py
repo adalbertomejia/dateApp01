@@ -5,9 +5,9 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from .models import Appointment
 from users.models import CustomUser
 
+from .models import Appointment
 
 BUSINESS_CONTEXT = {
     'business_name': 'Nutriologa María Pérez',
@@ -23,11 +23,11 @@ def home(request):
 
 
 def _build_schedule(start_date, days=7):
+    """Create availability map for the next N days."""
     end_date = start_date + timedelta(days=days - 1)
     appointments = (
         Appointment.objects.filter(date__range=(start_date, end_date))
         .values_list('date', 'time')
-        .order_by('date', 'time')
     )
 
     occupied_by_day = defaultdict(set)
@@ -45,71 +45,79 @@ def _build_schedule(start_date, days=7):
     return schedule, end_date
 
 
+def _availability_context(error_message=None):
+    """Shared context for the weekly availability page."""
+    today = date.today()
+    schedule, end_date = _build_schedule(today)
+    context = {
+        'schedule': schedule,
+        'start_date': today,
+        'end_date': end_date,
+    }
+    if error_message:
+        context['error_message'] = error_message
+    return context
+
+
+def _first_validation_message(error):
+    """Return a human-friendly first validation error message."""
+    if hasattr(error, 'message_dict') and error.message_dict:
+        first_field_errors = next(iter(error.message_dict.values()))
+        if first_field_errors:
+            return first_field_errors[0]
+
+    if getattr(error, 'messages', None):
+        return error.messages[0]
+
+    return 'No fue posible registrar la cita. Verifica los datos e inténtalo de nuevo.'
+
+
 def book_appointment(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        appointment_date = request.POST.get('date')
-        time = request.POST.get('time')
-        service = request.POST.get('service')
-        note = request.POST.get('note', '')
+    if request.method != 'POST':
+        return render(request, 'reservations/home.html', BUSINESS_CONTEXT)
 
-        related_user = request.user if request.user.is_authenticated else CustomUser.objects.filter(phone=phone).first()
+    appointment_data = {
+        'name': request.POST.get('name'),
+        'phone': request.POST.get('phone'),
+        'date': request.POST.get('date'),
+        'time': request.POST.get('time'),
+        'service': request.POST.get('service'),
+        'note': request.POST.get('note', ''),
+    }
 
-        appointment = Appointment(
-            user=related_user,
-            name=name,
-            phone=phone,
-            date=appointment_date,
-            time=time,
-            service=service,
-            note=note,
-        )
+    related_user = (
+        request.user
+        if request.user.is_authenticated
+        else CustomUser.objects.filter(phone=appointment_data['phone']).first()
+    )
 
-        try:
-            appointment.full_clean()
-            appointment.save()
-            return render(
-                request,
-                'reservations/confirmation.html',
-                {
-                    'name': name,
-                    'service': service,
-                    'date': appointment_date,
-                    'time': time,
-                    'phone': phone,
-                    'related_user': related_user,
-                },
-            )
-        except ValidationError:
-            today = date.today()
-            schedule, end_date = _build_schedule(today)
-            context = {
-                'schedule': schedule,
-                'start_date': today,
-                'end_date': end_date,
-                'error_message': 'La fecha y hora seleccionadas ya están ocupadas. Por favor, elige otra.',
-            }
-            return render(request, 'reservations/available_appointments.html', context)
+    appointment = Appointment(user=related_user, **appointment_data)
 
-    return render(request, 'reservations/home.html', BUSINESS_CONTEXT)
+    try:
+        appointment.full_clean()
+        appointment.save()
+    except ValidationError as error:
+        context = _availability_context(_first_validation_message(error))
+        return render(request, 'reservations/available_appointments.html', context)
+
+    return render(
+        request,
+        'reservations/confirmation.html',
+        {
+            **appointment_data,
+            'related_user': related_user,
+        },
+    )
 
 
 def get_unavailable_slots(request):
     appointments = Appointment.objects.values('date', 'time')
-    unavailable_slots = list(appointments)
-    return JsonResponse(unavailable_slots, safe=False)
+    return JsonResponse(list(appointments), safe=False)
 
 
 def available_appointments(request):
-    today = date.today()
-    schedule, end_date = _build_schedule(today)
     return render(
         request,
         'reservations/available_appointments.html',
-        {
-            'schedule': schedule,
-            'start_date': today,
-            'end_date': end_date,
-        },
+        _availability_context(),
     )

@@ -5,7 +5,10 @@ from django.db.models import Count
 from django.shortcuts import redirect, render
 
 from reservations.models import Appointment
+
 from .forms import CustomUserCreationForm
+
+DAILY_SLOT_CAPACITY = 7
 
 
 def can_access_admin_panel(user):
@@ -38,7 +41,7 @@ def dashboard(request):
     if can_access_admin_panel(request.user):
         return redirect('admin_dashboard')
 
-    appointments = Appointment.objects.filter(user=request.user).order_by('date', 'time')
+    appointments = Appointment.objects.filter(user=request.user)
     return render(request, 'users/dashboard.html', {'appointments': appointments})
 
 
@@ -48,11 +51,11 @@ def admin_dashboard(request):
     today = date.today()
     week_end = today + timedelta(days=6)
 
-    all_appointments = Appointment.objects.order_by('date', 'time')
+    all_appointments = Appointment.objects.all()
     today_appointments = all_appointments.filter(date=today)
     upcoming_appointments = all_appointments.filter(date__gte=today)
 
-    occupancy_rate = int((today_appointments.count() / 7) * 100) if today_appointments else 0
+    occupancy_rate = int((today_appointments.count() / DAILY_SLOT_CAPACITY) * 100) if today_appointments else 0
 
     appointments_by_service = list(
         upcoming_appointments
